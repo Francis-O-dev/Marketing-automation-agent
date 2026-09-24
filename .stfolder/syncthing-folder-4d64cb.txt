@@ -1,0 +1,5 @@
+# This directory is a Syncthing folder marker.
+# Do not delete.
+
+folderID: ppqnc-afzzt
+created: 2026-09-11T20:15:32+02:00
