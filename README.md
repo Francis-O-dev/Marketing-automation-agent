@@ -4,17 +4,26 @@ An intelligent marketing automation agent built with Node.js that reads leads fr
 
 ---
 
+## Branches
+
+| Branch             | Description                                  |
+| ------------------ | -------------------------------------------- |
+| `main`             | v1 — Flat file structure (beginner friendly) |
+| `v2-src-structure` | v2 — Professional src architecture (current) |
+
+---
+
 ## Features
 
 - Reads lead data automatically from Excel files (Facebook & Instagram ad exports)
-- Uses Groq AI (LLaMA/GPT models) to write personalized messages for each lead
+- Uses Groq AI to write personalized messages for each lead
 - Sends automated emails via Gmail
 - Sends automated WhatsApp messages via Twilio
 - Tracks each lead through 5 conversion stages automatically
 - Runs on a daily schedule with no manual intervention
 - Respects unsubscribe requests immediately
 - Stops messaging converted customers automatically
-- Logs every action with timestamps
+- Logs every action with timestamps using a centralized logger
 
 ---
 
@@ -34,27 +43,33 @@ An intelligent marketing automation agent built with Node.js that reads leads fr
 
 ## Tech Stack
 
-- Runtime: Node.js
-- AI: Groq AI API (openai/gpt-oss-20b model)
-- Email: Nodemailer + Gmail SMTP
-- WhatsApp: Twilio WhatsApp API
-- Excel: xlsx library
-- Scheduler: node-schedule (cron jobs)
-- Environment: dotenv
+- **Runtime:** Node.js
+- **AI:** Groq AI API (openai/gpt-oss-20b model)
+- **Email:** Nodemailer + Gmail SMTP
+- **WhatsApp:** Twilio WhatsApp API
+- **Excel:** xlsx library
+- **Scheduler:** node-schedule (cron jobs)
+- **Environment:** dotenv
 
 ---
 
 ## Project Structure
 
 marketing-automation-agent/
-├── agent.js # Main agent — orchestrates everything
-├── config.js # Central configuration file
-├── messageWriter.js # AI message generation
-├── emailSender.js # Email sending module
-├── whatsappSender.js # WhatsApp sending module
-├── stageTracker.js # Lead stage tracking and Excel management
-├── scheduler.js # Daily automatic scheduling
+├── src/
+│ ├── config/
+│ │ └── config.js # Central configuration file
+│ ├── services/
+│ │ ├── emailSender.js # Email sending module
+│ │ ├── messageWriter.js # AI message generation
+│ │ └── whatsappSender.js # WhatsApp sending module
+│ ├── core/
+│ │ ├── agent.js # Main agent orchestrator
+│ │ └── stageTracker.js # Lead stage tracking and Excel management
+│ └── utils/
+│ └── logger.js # Centralized logging utility
 ├── createLeads.js # Creates sample leads Excel file
+├── scheduler.js # Daily automatic scheduling
 ├── leads.xlsx # Leads database (Excel)
 ├── .env.example # Environment variables template
 └── package.json # Project dependencies
@@ -66,8 +81,9 @@ marketing-automation-agent/
 ### 1. Clone the repository
 
 bash
-git clone https://github.com/Francis-O-dev/marketing-automation-agent.git
-cd marketing-automation-agent
+git clone https://github.com/Francis-O-dev/Marketing-automation-agent.git
+cd Marketing-automation-agent
+git checkout v2-src-structure
 
 ### 2. Install dependencies
 
@@ -89,7 +105,7 @@ node createLeads.js
 ### 5. Run the agent manually
 
 bash
-node agent.js
+node src/core/agent.js
 
 ### 6. Run on automatic daily schedule
 
@@ -107,7 +123,7 @@ GMAIL_APP_PASSWORD=your-16-character-app-password
 GROQ_API_KEY=your-groq-api-key
 TWILIO_ACCOUNT_SID=your-twilio-account-sid
 TWILIO_AUTH_TOKEN=your-twilio-auth-token
-CLINIC_PHONE=+39your-phone-number
+CLINIC_PHONE=your-phone-number
 
 ---
 
@@ -122,6 +138,19 @@ CLINIC_PHONE=+39your-phone-number
 
 ---
 
+## Architecture
+
+This version follows a professional modular architecture:
+
+config/ → All settings in one place
+services/ → External integrations (Email, WhatsApp, AI)
+core/ → Business logic (Agent, Stage Tracking)
+utils/ → Shared utilities (Logger)
+
+Each module has a single responsibility and communicates through clean imports. This makes the codebase easy to maintain, test and scale.
+
+---
+
 ## Production Deployment
 
 For production use, replace the Twilio sandbox with a registered WhatsApp Business number:
@@ -129,13 +158,13 @@ For production use, replace the Twilio sandbox with a registered WhatsApp Busine
 1. Register your business number at business.whatsapp.com
 2. Connect it to Twilio in the console
 3. Create Meta-approved message templates for first contact
-4. Update `fromNumber` in `config.js` with your real business number
+4. Update `fromNumber` in `src/config/config.js` with your real business number
 
 ---
 
 ## Author
 
-**Francis O.**
+Francis O.
 Full-Stack Developer | AI Automation
 [GitHub](https://github.com/Francis-O-dev)
 
@@ -143,4 +172,4 @@ Full-Stack Developer | AI Automation
 
 ## License
 
-MIT License — feel free to use and modify for your own projects.
+MIT License — feel free to use and modify for your own project
