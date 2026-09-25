@@ -1,7 +1,8 @@
 const nodemailer = require("nodemailer");
-const config = require("./config");
+const config = require("../config/config");
+const { log, logSuccess, logError } = require("../utils/logger");
 
-// CREATE THE EMAIL CONNECTION
+// -- CREATE THE EMAIL CONNECTION --
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
@@ -10,10 +11,9 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-// SEND EMAIL FUNCTION
+// -- SEND EMAIL FUNCTION --
 async function sendEmail(leadName, leadEmail, subject, message) {
   try {
-
     const emailOptions = {
       from: `"${config.email.senderName}" <${config.email.senderAddress}>`,
       to: leadEmail,
@@ -22,11 +22,10 @@ async function sendEmail(leadName, leadEmail, subject, message) {
     };
 
     await transporter.sendMail(emailOptions);
-    console.log(`Email sent successfully to ${leadName} at ${leadEmail}`);
+    logSuccess(`Email sent successfully to ${leadName} at ${leadEmail}`);
     return true;
-
   } catch (error) {
-    console.log(`Failed to send email to ${leadName}: ${error.message}`);
+    logError(`Failed to send email to ${leadName}: ${error.message}`);
     return false;
   }
 }

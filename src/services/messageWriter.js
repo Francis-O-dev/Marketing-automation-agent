@@ -1,5 +1,6 @@
 const Groq = require("groq-sdk");
-const config = require("./config");
+const config = require("../config/config");
+const { logSuccess, logError, logWarning } = require("../utils/logger");
 
 // -- CREATE THE GROQ AI CONNECTION --
 const client = new Groq({
@@ -9,8 +10,6 @@ const client = new Groq({
 // -- EXTRACT TEXT FROM RESPONSE --
 function extractText(response) {
   const choice = response.choices[0];
-  // Some models put answer in content, others in reasoning
-  // We check content first, then fall back to reasoning
   const content = choice.message.content;
   const reasoning = choice.message.reasoning;
 
@@ -19,13 +18,10 @@ function extractText(response) {
   }
 
   if (reasoning && reasoning.trim() !== "") {
-    // Extract the actual message from reasoning
-    // The reasoning contains the draft — we find the quoted part
     const draftMatch = reasoning.match(/"([^"]{20,})"/s);
     if (draftMatch) {
       return draftMatch[1].trim();
     }
-    // If no quoted part found, return the last paragraph of reasoning
     const paragraphs = reasoning.trim().split("\n\n");
     return paragraphs[paragraphs.length - 1].trim();
   }
@@ -52,14 +48,14 @@ async function writeMessage(lead) {
     const message = extractText(response);
 
     if (!message) {
-      console.log(`Failed to write message for ${lead.name}: empty response`);
+      logError(`Failed to write message for ${lead.name}: empty response`);
       return null;
     }
 
-    console.log(`Message written for ${lead.name}`);
+    logSuccess(`Message written for ${lead.name}`);
     return message;
   } catch (error) {
-    console.log(`Failed to write message for ${lead.name}: ${error.message}`);
+    logError(`Failed to write message for ${lead.name}: ${error.message}`);
     return null;
   }
 }
@@ -179,14 +175,14 @@ async function writeSubject(lead) {
 
     if (!subject) {
       const fallback = `Your ${lead.interested_in} Consultation at ${config.clinic.name}`;
-      console.log(`Using fallback subject for ${lead.name}`);
+      logWarning(`Using fallback subject for ${lead.name}`);
       return fallback;
     }
 
-    console.log(`Subject written for ${lead.name}: "${subject}"`);
+    logSuccess(`Subject written for ${lead.name}: "${subject}"`);
     return subject;
   } catch (error) {
-    console.log(`Failed to write subject for ${lead.name}: ${error.message}`);
+    logError(`Failed to write subject for ${lead.name}: ${error.message}`);
     return `Your ${lead.interested_in} Consultation at ${config.clinic.name}`;
   }
 }
